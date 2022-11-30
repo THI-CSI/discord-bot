@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "discord.js": "^14.7.0"
+  },
+  "name": "thi_inf_csi_authbot",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "bee1850:bot"
+  },
+  "author": "Repository Collaborators",
+  "license": "ISC"
+}
