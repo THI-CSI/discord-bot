@@ -1,0 +1,8 @@
+CREATE TABLE Tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token VARCHAR(6) NOT NULL,
+    targetRole VARCHAR(32) NOT NULL,
+    comment TEXT NOT NULL,
+    createdAt DATETIME NOT NULL,
+    usedAt DATETIME
+);
