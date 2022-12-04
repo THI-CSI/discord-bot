@@ -13,6 +13,8 @@ module.exports = class DiscordBot extends Client {
         this.token = options.token;
 
         this.events = new Collection();
+
+        this.commands = new Collection();
     }
 
 

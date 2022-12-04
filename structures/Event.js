@@ -4,6 +4,7 @@ module.exports = class Event {
         this.name = name;
         this.client = client;
         this.type = options.once ? 'once' : 'on';
+        this.isActive = options.isActive;
         this.emitter = (typeof options.emitter === 'string' ? this.client[options.emitter] : options.emitter) || this.client;
 
     }

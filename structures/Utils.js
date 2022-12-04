@@ -17,6 +17,7 @@ module.exports = class Utils {
         return `${path.dirname(require.main.filename)}${path.sep}`.replace(/\\/g, "/");
     }
     async loadEvents() {
+        this.client.events.clear();
         return glob(`${this.directory}events/**/*.js`).then(events => {
             for (const eventFile of events) {
                 delete require.cache[eventFile];
@@ -27,8 +28,11 @@ module.exports = class Utils {
                 const event = new File(this.client, name);
                 // TODO - Logging
                 if (!(event instanceof Event)) throw new TypeError(`The Event ${name} is not an instance of Event`);
-                this.client.events.set(event.name, event);
-                event.emitter[event.type](name, (...args) => event.run(...args));
+                if (event.isActive) {
+                    this.client.events.set(event.name, event);
+                    event.emitter[event.type](name, (...args) => event.run(...args));
+                }
+
             }
         });
     }
