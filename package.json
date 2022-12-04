@@ -2,7 +2,8 @@
   "dependencies": {
     "discord.js": "^14.7.0",
     "dotenv": "^16.0.3",
-    "glob": "^8.0.3"
+    "glob": "^8.0.3",
+    "mysql": "^2.18.1"
   },
   "name": "thi_inf_csi_authbot",
   "description": "",
