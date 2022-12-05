@@ -25,7 +25,7 @@ CREATE TABLE bot.role_permissions (
 /*
 CREATE TABLE bot.users (
   `userId` VARCHAR(20) PRIMARY KEY,
-  data` VARBINARY(MAX)
+  `data` LONGBLOB
 );
 
 CREATE TABLE bot.user_permissions (
