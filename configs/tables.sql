@@ -6,3 +6,33 @@ CREATE TABLE bot.tokens (
 	`usedAt` DATETIME NULL DEFAULT NULL,
 	PRIMARY KEY (`token`)
 ) ENGINE = INNODB;
+
+CREATE TABLE bot.roles (
+  `roleId` VARCHAR(20) PRIMARY KEY NOT NULL,
+  `serverId` VARCHAR(20) NOT NULL,
+  `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  `comment` VARCHAR(255) DEFAULT NULL
+) ENGINE=INNODB;
+
+CREATE TABLE bot.role_permissions (
+  `permissionId` VARCHAR(20) PRIMARY KEY NOT NULL,
+  `roleId` VARCHAR(20) NOT NULL,
+  `permission` VARCHAR(255) NOT NULL,
+  `comment` VARCHAR(255) DEFAULT NULL,
+  FOREIGN KEY (`roleId`) REFERENCES `roles`(`roleId`)
+) ENGINE=INNODB;
+
+/*
+CREATE TABLE bot.users (
+  `userId` VARCHAR(20) PRIMARY KEY,
+  data` VARBINARY(MAX)
+);
+
+CREATE TABLE bot.user_permissions (
+  `permissionId` VARCHAR(20) PRIMARY KEY NOT NULL,
+  `userId` VARCHAR(20) NOT NULL,
+  `permission` VARCHAR(255) NOT NULL,
+  `comment` VARCHAR(255) DEFAULT NULL,
+  FOREIGN KEY (`userId`) REFERENCES `users`(`userId`)
+) ENGINE=INNODB;
+*/
