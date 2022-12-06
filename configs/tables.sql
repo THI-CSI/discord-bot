@@ -22,6 +22,17 @@ CREATE TABLE bot.users (
 );
 */
 
+CREATE TRIGGER uppercase_permission_names
+BEFORE INSERT ON permissions
+FOR EACH ROW
+SET NEW.permissionName = UPPER(REPLACE(NEW.permissionName,' ', '_'));
+
+
+CREATE TABLE permissions (
+  `permissionName` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`permissionName`)
+) ENGINE=INNODB;
+
 CREATE TABLE bot.role_permissions (
   `permissionId` VARCHAR(50) DEFAULT UUID(),
   `roleId` VARCHAR(20) NOT NULL,
@@ -31,7 +42,8 @@ CREATE TABLE bot.role_permissions (
   `grantedBy` VARCHAR(20) NULL DEFAULT NULL,
   PRIMARY KEY (`permissionId`),
   FOREIGN KEY (`roleId`) REFERENCES `roles`(`roleId`),
-  FOREIGN KEY (`grantedBy`) REFERENCES `users`(`userId`)
+  FOREIGN KEY (`grantedBy`) REFERENCES `users`(`userId`),
+  FOREIGN KEY (`permission`) REFERENCES `permissions`(`permissionName`)
 ) ENGINE=INNODB;
 
 /*
@@ -44,7 +56,8 @@ CREATE TABLE bot.user_permissions (
   `grantedBy` VARCHAR(20) NULL DEFAULT NULL,
   PRIMARY KEY (`permissionId`),
   FOREIGN KEY (`userId`) REFERENCES `users`(`userId`),
-  FOREIGN KEY (`grantedBy`) REFERENCES `users`(`userId`)
+  FOREIGN KEY (`grantedBy`) REFERENCES `users`(`userId`),
+  FOREIGN KEY (`permission`) REFERENCES `permissions`(`permissionName`)
 ) ENGINE=INNODB;
 
 */
