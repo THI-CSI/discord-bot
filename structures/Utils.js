@@ -16,6 +16,7 @@ module.exports = class Utils {
     get directory() {
         return `${path.dirname(require.main.filename)}${path.sep}`.replace(/\\/g, "/");
     }
+
     async loadEvents() {
         this.client.events.clear();
         return glob(`${this.directory}events/**/*.js`).then(events => {
@@ -24,16 +25,27 @@ module.exports = class Utils {
                 const {name} = path.parse(eventFile);
                 const File = require(eventFile);
                 // TODO - Logging
-                if (!this.isClass(File)) throw new TypeError(`The Event ${name} does not export a class.`);
+                if (!this.isClass(File)) {
+                    this.client.logger.error('INTERNAL', [`The Event ${name} does not export a class.`])
+                    throw new TypeError(`The Event ${name} does not export a class.`);
+                }
                 const event = new File(this.client, name);
                 // TODO - Logging
-                if (!(event instanceof Event)) throw new TypeError(`The Event ${name} is not an instance of Event`);
+                if (!(event instanceof Event)) {
+                    this.client.logger.error('INTERNAL', [`The Event ${name} is not an instance of Event`])
+                    throw new TypeError(`The Event ${name} is not an instance of Event`);
+                }
                 if (event.isActive) {
+                    this.client.logger.debug('INTERNAL', [`Event ${event.name} was loaded!`])
                     this.client.events.set(event.name, event);
                     event.emitter[event.type](name, (...args) => event.run(...args));
                 }
 
             }
         });
+    }
+
+    encryptJSON (json) {
+        return this.client.db.encrypt(JSON.stringify(json));
     }
 }

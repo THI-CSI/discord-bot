@@ -10,8 +10,8 @@ module.exports = class extends Event {
 
     async run() {
 
-        // TODO - Logging
-        console.log([
+
+        this.client.info('BOT', [
             `Bot ${this.client.user.username} is Ready!`,
             `${this.client.guilds.cache.filter(g => g.available).size} Guilds available.`
         ].join('\n'))

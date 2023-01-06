@@ -1,6 +1,10 @@
 const {Client, GatewayIntentBits, Collection} = require("discord.js");
+
+// Local Modules
 const Utils = require("./Utils");
 const Database = require("./Database");
+const Logger = require("./Logger");
+
 module.exports = class DiscordBot extends Client {
 
     constructor(options = {}) {
@@ -17,7 +21,9 @@ module.exports = class DiscordBot extends Client {
 
         this.commands = new Collection();
 
-        this.db = new Database();
+        this.db = Database;
+
+        this.logger = Logger;
     }
 
 
@@ -31,12 +37,8 @@ module.exports = class DiscordBot extends Client {
     }
 
     async start(token = this.token) {
-        await this.db.init();
-        await this.db.testConnection()
         await this.utils.loadEvents();
         await super.login(token);
-
-
     }
 
 
