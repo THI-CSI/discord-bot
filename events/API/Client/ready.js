@@ -11,10 +11,10 @@ module.exports = class extends Event {
     async run() {
 
 
-        this.client.info('BOT', [
+        this.client.logger.info('BOT', [
             `Bot ${this.client.user.username} is Ready!`,
             `${this.client.guilds.cache.filter(g => g.available).size} Guilds available.`
-        ].join('\n'))
+        ])
 
     }
 }
