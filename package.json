@@ -15,6 +15,16 @@
     "type": "git",
     "url": "bee1850:bot"
   },
+  "scripts": {
+    "lintfix": "eslint . --fix",
+    "start": "node .",
+    "lint:": "eslint .",
+    "dev": "nodemon ."
+  },
   "author": "Repository Collaborators",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.31.0",
+    "nodemon": "^2.0.20"
+  }
 }

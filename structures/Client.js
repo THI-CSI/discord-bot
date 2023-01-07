@@ -1,45 +1,46 @@
-const {Client, GatewayIntentBits, Collection} = require("discord.js");
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
 
 // Local Modules
-const Utils = require("./Utils");
-const Database = require("./Database");
-const Logger = require("./Logger");
+const Utils = require('./Utils');
+const Database = require('./Database');
+const Logger = require('./Logger');
 
 module.exports = class DiscordBot extends Client {
 
-    constructor(options = {}) {
-        super({
-            intents: [GatewayIntentBits.Guilds]
-        });
+	constructor(options = {}) {
+		super({
+			intents: [GatewayIntentBits.Guilds],
+		});
 
-        // this.validate(options);
-        this.utils = new Utils(this);
+		// this.validate(options);
+		this.utils = new Utils(this);
 
-        this.token = options.token;
+		this.token = options.token;
 
-        this.events = new Collection();
+		this.events = new Collection();
 
-        this.commands = new Collection();
+		this.commands = new Collection();
 
-        this.db = Database;
+		this.db = Database;
 
-        this.logger = Logger;
-    }
-
-
-    // TODO - To be added in the future, as its not currently being used. See Issue #7 by bee1850
-    validate(options) {
+		this.logger = Logger;
+	}
 
 
-        // TODO - Logging
-        if (typeof options !== 'object') throw new TypeError('Options should be a type of Object.');
-
-    }
-
-    async start(token = this.token) {
-        await this.utils.loadEvents();
-        await super.login(token);
-    }
+	// TODO - To be added in the future, as its not currently being used. See Issue #7 by bee1850
+	validate(options) {
 
 
-}
+		// TODO - Logging
+		if (typeof options !== 'object') throw new TypeError('Options should be a type of Object.');
+
+	}
+
+	async start(token = this.token) {
+		await this.utils.loadEvents();
+		await this.utils.loadCommands();
+		await super.login(token);
+	}
+
+
+};
