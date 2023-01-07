@@ -6,9 +6,8 @@ module.exports = class extends Command {
 		super(...args, {
 			description: 'Registers new Roles into the Database',
 			isActive: true,
-
+			requiredPerms: ['MANAGE_ROLES_GUILD'],
 		});
-
 	}
 
 	async run(interaction) {
@@ -19,6 +18,32 @@ module.exports = class extends Command {
 
 			const role = interaction.options.getRole('role');
 			const comment = interaction.options.getString('comment') ?? 'NULL';
+
+			// Check if User has the required Permissions
+			let permsSelectSql = 'SELECT permission from user_permissions WHERE userId = ?';
+			const permsSelectValues = [interaction.user.id];
+
+			const memberRoles = interaction.member.roles.cache;
+
+			if (memberRoles.size > 0) {
+				permsSelectSql += ' UNION SELECT permission from role_permissions WHERE ';
+				memberRoles.forEach(cachedRole => {
+					permsSelectSql += 'roleId = ? OR ';
+					permsSelectValues.push(cachedRole.id);
+				});
+				permsSelectSql = permsSelectSql.substring(0, permsSelectSql.length - 4) + ';';
+			}
+
+			let permsSelectResult = await this.client.db.select(permsSelectSql, permsSelectValues);
+
+			permsSelectResult = permsSelectResult.map(row => row.permission);
+
+			if (!this.requiredPerms.every(element => permsSelectResult.includes(element))) {
+				return interaction.editReply({
+					content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions: **${permsSelectResult.join(', ')}**`,
+					ephemeral: true,
+				});
+			}
 
 			// Check if we can use this role in the future
 			if (role.managed) {
@@ -57,7 +82,7 @@ module.exports = class extends Command {
 				const sql = 'INSERT INTO `roles` (`roleId`, `serverId`, `createdAt`, `comment`) VALUES (?, ?, current_timestamp(), ?);';
 				const values = [role.id, interaction.guild.id, comment];
 
-				await this.client.db.insert(sql, values);
+				await this.client.db.query(sql, values);
 			}
 			catch (e) {
 				return interaction.reply({

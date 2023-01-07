@@ -26,6 +26,7 @@ const pool = mysql.createPool({
 	password: process.env.MARIADB_USER_PASSWORD,
 	database: process.env.MARIADB_DATABASE,
 	port: process.env.MARIADB_PORT,
+	dateStrings: true,
 	queueLimit: process.env.MARIADB_QUEUELIMIT,
 	waitForConnections: process.env.MARIADB_WAITFORCONNECTIONS,
 });
@@ -39,7 +40,7 @@ module.exports = {
 		encrypted += cipher.final('hex');
 		return encrypted;
 	}),
-	insert: (sql, values) => {
+	query: (sql, values) => {
 		return new Promise(async (resolve, reject) => { // eslint-disable-line no-async-promise-executor
 			try {
 				const result = await pool.query(sql, values);
@@ -116,7 +117,7 @@ module.exports = {
 			catch (e) {
 				Logger.error('DATABASE', ['NEW QUERY FAILED:', `SQL: ${sql.replace(/\?/g, function() {
 					return values.shift();
-				})}`, `Error: ${e.message}`]);
+				})}`, `Error: ${e}`]);
 				reject(e);
 			}
 		});

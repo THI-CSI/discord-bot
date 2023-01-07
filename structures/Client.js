@@ -37,6 +37,7 @@ module.exports = class DiscordBot extends Client {
 	}
 
 	async start(token = this.token) {
+
 		await this.utils.loadEvents();
 		await this.utils.loadCommands();
 		await super.login(token);

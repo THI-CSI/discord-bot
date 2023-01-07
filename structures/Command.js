@@ -6,7 +6,8 @@ module.exports = class Command {
 		this.name = options.name || name;
 		this.description = options.description || 'No description given';
 		this.category = options.category || 'users';
-		this.isActive = options.isActive;
+		this.isActive = options.isActive || false;
+		this.requiredPerms = options.requiredPerms || [];
 	}
 
 
