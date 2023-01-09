@@ -62,7 +62,7 @@ module.exports = class extends Command {
 				}
 			}
 			catch (e) {
-				this.client.logger.error('INTERNAL', ['Error while trying to authenticate User', e.message]);
+				this.client.error('INTERNAL', ['Error while trying to authenticate User', e.message]);
 			}
 		}
 

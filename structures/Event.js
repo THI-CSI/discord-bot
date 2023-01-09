@@ -10,7 +10,7 @@ module.exports = class Event {
 	}
 
 	async run(...args) { // eslint-disable-line no-unused-vars
-		this.client.logger.error('INTERNAL', [`${this.name} Event does not have a run method!`]);
+		this.client.error('INTERNAL', [`${this.name} Event does not have a run method!`]);
 		throw new Error(`${this.name} was not fully implemented yet.`);
 	}
 

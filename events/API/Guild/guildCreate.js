@@ -37,10 +37,10 @@ module.exports = class extends Event {
 			for (const command of queue) {
 				await guild.commands.create(command);
 			}
-			this.client.logger.debug('SLASHCOMMANDS', [`Added ${queue.length} new Guild-Only Slash Commands to ${guild.name}`]);
+			this.client.debug('SLASHCOMMANDS', ['']);
 		}
 		catch (e) {
-			this.client.logger.error('SLASHCOMMADNS', ['Failed creating a slash command:', e.message]);
+			this.client.error('SLASHCOMMANDS', ['Failed creating a slash command:', e.message]);
 		}
 
 

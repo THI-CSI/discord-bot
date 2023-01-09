@@ -91,7 +91,7 @@ module.exports = class extends Command {
 					const insertResult = await this.client.db.query(insertSql, insertValues);
 					const token = insertResult[0][0].token;
 					tokens.push(token);
-					this.client.logger.verbose('TOKEN', [`Token '${token}' was generated for the Role with the following ID: ${role.id} on the Guild with the following ID: ${guild.id} by User ID: ${interaction.user.id}`]);
+					this.client.verbose('TOKEN', [`Token '${token}' was generated for the Role with the following ID: ${role.id} on the Guild with the following ID: ${guild.id} by User ID: ${interaction.user.id}`]);
 				}
 
 				const embed = new EmbedBuilder()
@@ -107,11 +107,11 @@ module.exports = class extends Command {
 				return await interaction.editReply({
 					embeds: [embed],
 					ephemeral: true,
-				}).catch(e => this.client.logger.error('API', ['Error while replying to a interaction', e.message]));
+				}).catch(e => this.client.error('API', ['Error while replying to a interaction', e.message]));
 
 			}
 			catch (e) {
-				this.client.logger.error('INTERNAL', ['Error while trying to create Tokens!', e.message]);
+				this.client.error('INTERNAL', ['Error while trying to create Tokens!', e.message]);
 				return await interaction.editReply({
 					content: 'There was an internal Error regarding your query. Please contact the Maintainer with the ServerID and the current Date.',
 					ephemeral: true,

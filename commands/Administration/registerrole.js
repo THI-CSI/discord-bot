@@ -91,11 +91,11 @@ module.exports = class extends Command {
 				});
 			}
 
-			this.client.logger.verbose('SERVICE', [`A new Role (${role.id}) was registered for Server ${role.guild.id} by User with the Id ${interaction.user.id}!`]);
+			this.client.verbose('SERVICE', [`A new Role (${role.id}) was registered for Server ${role.guild.id} by User with the Id ${interaction.user.id}!`]);
 			return interaction.reply({
 				content: 'The Role was successfully registered into the Database!',
 				ephemeral: true,
-			}).catch(e => this.client.logger.error('API', ['Error while trying to reply to an Interaction:', e.message]));
+			}).catch(e => this.client.error('API', ['Error while trying to reply to an Interaction:', e.message]));
 
 
 		}

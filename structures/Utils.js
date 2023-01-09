@@ -28,17 +28,17 @@ module.exports = class Utils {
 				const File = require(eventFile);
 				// TODO - Logging
 				if (!this.isClass(File)) {
-					this.client.logger.error('INTERNAL', [`The Event ${name} does not export a class.`]);
+					this.client.error('INTERNAL', [`The Event ${name} does not export a class.`]);
 					throw new TypeError(`The Event ${name} does not export a class.`);
 				}
 				const event = new File(this.client, name);
 				// TODO - Logging
 				if (!(event instanceof Event)) {
-					this.client.logger.error('INTERNAL', [`The Event ${name} is not an instance of Event`]);
+					this.client.error('INTERNAL', [`The Event ${name} is not an instance of Event`]);
 					throw new TypeError(`The Event ${name} is not an instance of Event`);
 				}
 				if (event.isActive) {
-					this.client.logger.verbose('INTERNAL', [`Event ${event.name} was loaded!`]);
+					this.client.verbose('INTERNAL', [`Event ${event.name} was loaded!`]);
 					this.client.events.set(event.name, event);
 					event.emitter[event.type](name, (...args) => event.run(...args));
 				}
@@ -55,16 +55,16 @@ module.exports = class Utils {
 				const { name } = path.parse(commandFile);
 				const File = require(commandFile);
 				if (!this.isClass(File)) {
-					this.client.logger.error('INTERNAL', [`The Command ${name} does not export a class.`]);
+					this.client.error('INTERNAL', [`The Command ${name} does not export a class.`]);
 					throw new TypeError(`The Command ${name} does not export a class.`);
 				}
 				const command = new File(this.client, name.toLowerCase());
 				if (!(command instanceof Command)) {
-					this.client.logger.error('INTERNAL', [`The Command ${name} is not an instance of Event`]);
+					this.client.error('INTERNAL', [`The Command ${name} is not an instance of Event`]);
 					throw new TypeError(`The Command ${name} is not an instance of Command.`);
 				}
 				if (command.isActive) {
-					this.client.logger.verbose('INTERNAL', [`Command ${command.name} was loaded!`]);
+					this.client.verbose('INTERNAL', [`Command ${command.name} was loaded!`]);
 					this.client.commands.set(command.name, command);
 				}
 

@@ -43,7 +43,7 @@ module.exports = class extends Event {
 			this.client.emit('AutocompleteInteraction', interaction);
 		}
 		if (interactionType !== 'Unknown') {
-			this.client.logger.debug('EVENTS', [`New ${interactionType} Event triggered!`, `Guild: ${interaction.guild.name} [${interaction.guild.id}], Guild: ${interaction.member.user.tag} [${interaction.member.user.id}]`]);
+			this.client.debug('EVENTS', [`New ${interactionType} Event triggered!`, `Guild: ${interaction.guild.name} [${interaction.guild.id}], Guild: ${interaction.member.user.tag} [${interaction.member.user.id}]`]);
 		}
 
 	}

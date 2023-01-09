@@ -19,8 +19,6 @@ module.exports = class extends Command {
 			message += `[${user.tag}](https://discord.id/?prefill=${user.id}), `;
 		}
 		message = message.substring(0, message.length - 2);
-
-
 		interaction.reply({ content:message, ephemeral: true, flags: MessageFlags.SuppressEmbeds });
 
 	}

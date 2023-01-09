@@ -3,7 +3,7 @@ const { Client, GatewayIntentBits, Collection } = require('discord.js');
 // Local Modules
 const Utils = require('./Utils');
 const Database = require('./Database');
-const Logger = require('./Logger');
+const { info, warn, verbose, error, debug } = require('./Logger');
 
 module.exports = class DiscordBot extends Client {
 
@@ -23,7 +23,11 @@ module.exports = class DiscordBot extends Client {
 
 		this.db = Database;
 
-		this.logger = Logger;
+		this.error = error;
+		this.warn = warn;
+		this.info = info;
+		this.verbose = verbose;
+		this.debug = debug;
 	}
 
 
