@@ -24,40 +24,30 @@ module.exports = class extends Command {
 				const amount = interaction.options.getInteger('amount');
 				const comment = interaction.options.getString('comment') ?? 'NULL';
 
-				const memberRoles = interaction.member.roles.cache;
-
-				// Check if User has the required Permissions
-				let permsSelectSql = 'SELECT permission from user_permissions WHERE userId = ?';
-				const permsSelectValues = [interaction.user.id];
-
-				if (memberRoles.size > 0) {
-					permsSelectSql += ' UNION SELECT permission from role_permissions WHERE ';
-					memberRoles.forEach(cachedRole => {
-						permsSelectSql += 'roleId = ? OR ';
-						permsSelectValues.push(cachedRole.id);
-					});
-					permsSelectSql = permsSelectSql.substring(0, permsSelectSql.length - 4) + ';';
-				}
-
-				let permsSelectResult = await this.client.db.select(permsSelectSql, permsSelectValues);
-
-				permsSelectResult = permsSelectResult.map(row => row.permission);
-
-				if (!this.requiredPerms.every(element => permsSelectResult.includes(element))) {
-					return interaction.editReply({
-						content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions: **${permsSelectResult.join(', ')}**`,
+				const privCheck = await this.client.utils.checkUserPriviledge(interaction.user.id, interaction.member.roles.cache, this.requiredPerms);
+				if (!privCheck.success) {
+					return interaction.reply({
+						content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions: **${privCheck.perms.join(', ')}**`,
 						ephemeral: true,
 					});
 				}
 
-
-				if (role.managed) {
-					return interaction.editReply({
-						content: 'This Role is not eligible for Token creation as it is managed by another service. Registering this Role does not work.',
-						ephemeral: true,
-					});
+				const self = await interaction.guild.members.fetchMe();
+				const roleCompare = await this.client.utils.compareRolePerms(role, self);
+				if (!roleCompare.success) {
+					if (roleCompare.error === 'ROLE_HIGHER') {
+						return interaction.reply({
+							content: 'The specified Role is higher than or equal to any of mine and thus not managable by me.',
+							ephemeral: true,
+						});
+					}
+					else if (roleCompare.error === 'ROLE_MANAGED') {
+						return interaction.reply({
+							content: 'The specified Role is being managed by another service.',
+							ephemeral: true,
+						});
+					}
 				}
-
 
 				const selectSql = 'SELECT * from roles WHERE serverId = ?;';
 				const selectValues = [guild.id];

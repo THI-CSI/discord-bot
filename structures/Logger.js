@@ -18,13 +18,11 @@ const myFormat = printf(({ level, label, messages, timestamp }) => { // eslint-d
 });
 
 /*
-
     Font styles: bold, dim, italic, underline, inverse, hidden, strikethrough.
 
     Font foreground colors: black, red, green, yellow, blue, magenta, cyan, white, gray, grey.
 
     Background colors: blackBG, redBG, greenBG, yellowBG, blueBG magentaBG, cyanBG, whiteBG
-
 */
 
 const customFormats = {

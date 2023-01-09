@@ -8,6 +8,7 @@ module.exports = class extends Event {
 	}
 
 	async run(interaction) {
+
 		let interactionType = 'Unknown';
 		if (interaction.isAnySelectMenu()) {
 
