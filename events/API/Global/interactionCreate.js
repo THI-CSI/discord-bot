@@ -8,41 +8,43 @@ module.exports = class extends Event {
 	}
 
 	async run(interaction) {
-
-		// Check type of interation. We're only interested in Messages and Application Commands (I.e.: /authenticate, /sweep)
-		if (interaction.type === 3) {
+		let interactionType = 'Unknown';
+		if (interaction.isAnySelectMenu()) {
 
 			/*
-            We detected a Message Component Event!
-
-            Now we just need to figure out what Component it exactly was and reroute the interaction to the corresponding internal Event
-            */
-
-			switch (interaction.componentType) {
-			case 3: {
-				// Select Menu
-				this.client.emit('SelectMenuInteraction', interaction);
-			}
-				break;
-			case 2: {
-				// Button
-				this.client.emit('ButtonInteraction', interaction);
-			}
-				break;
-			}
-
+                We detected a Select Menu Interaction of any kind - Lets reroute to the according internal Event.
+             */
+			interactionType = 'SelectMenuInteraction';
+			this.client.emit('SelectMenuInteraction', interaction);
 
 		}
-		else if (interaction.type === 2) {
+		else if (interaction.isButton()) {
+			/*
+                We detected a Button Interaction Event - Lets reroute to the according internal Event.
+             */
+			interactionType = 'ButtonInteraction';
+			this.client.emit('ButtonInteraction', interaction);
+		}
+		else if (interaction.isChatInputCommand()) {
+
 
 			/*
-            We detected an Application Command Event - Lets reroute to the according internal Event.
+                We detected an Application Command Event - Lets reroute to the according internal Event.
             */
+			interactionType = 'CommandInteraction';
 			this.client.emit('CommandInteraction', interaction);
-		}
 
-		// TODO Logging
-		// Add some info for every Interaction usage...
+		}
+		else if (interaction.isAutocomplete()) {
+			/*
+                Someone is trying to use a Autocomplete-Supported Command. Lets try to give them choices.
+                Don't Log this.
+                */
+			this.client.emit('AutocompleteInteraction', interaction);
+		}
+		if (interactionType !== 'Unknown') {
+			this.client.logger.debug('EVENTS', [`New ${interactionType} Event triggered!`, `Guild: ${interaction.guild.name} [${interaction.guild.id}], Guild: ${interaction.member.user.tag} [${interaction.member.user.id}]`]);
+		}
 
 	}
 };
