@@ -37,6 +37,13 @@ module.exports = class extends Command {
 			.setDescription(`Current ${process.env.MAINTAINER_DISCORD_ID.split(',').length === 1 ? 'maintainer' : 'maintainers'} for this Instance`).toJSON();
 		queue.push(maintainerCommand);
 
+		const configure = new SlashCommandBuilder()
+			.setName('configure')
+			.setDMPermission(false)
+			.setDescription('Configure your Server\'s Settings').toJSON();
+		queue.push(configure);
+
+
 		const authenticationCommand = new SlashCommandBuilder()
 			.setName('authenticate')
 			.setDMPermission(false)
@@ -93,12 +100,12 @@ module.exports = class extends Command {
 			for (const command of queue) {
 				await interaction.guild.commands.create(command);
 			}
-			this.client.logger.debug('SLASHCOMMANDS', [`Added ${queue.length} new Guild-Only Slash Commands to ${interaction.guild.name}`]);
-			await interaction.editReply({ content: `Cool!\n${queue.length} Commands were added to your Guild!\nIncase of any questions, feel free to contact the \`/maintainer\`\nEnjoy!` });
+			this.client.debug('SLASHCOMMANDS', [`Added ${queue.length} new Guild-Only Slash Commands to ${interaction.guild.name}`]);
+			await interaction.editReply({ content: `Cool!\n${queue.length} Commands were added to your Guild!\nPlease register a Default Role for new Members.\n1. \`/registerrole\`\n2. \`/configure\`\n3. *Choose Visitorrole* and follow the steps!\nIncase of any questions, feel free to contact the \`/maintainer\`\nEnjoy!` });
 		}
 		catch (e) {
 			await interaction.editReply({ content: 'There was a Problem while setting up your server. Please try again later or contact the maintainer.', ephemeral: true });
-			this.client.logger.error('SLASHCOMMADNS', ['Failed creating a slash command:', e.message]);
+			this.client.error('SLASHCOMMADNS', ['Failed creating a slash command:', e.message]);
 		}
 
 	}

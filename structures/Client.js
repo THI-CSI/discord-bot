@@ -23,6 +23,8 @@ module.exports = class DiscordBot extends Client {
 
 		this.db = Database;
 
+		this.changedRoles = new Collection();
+
 		this.error = error;
 		this.warn = warn;
 		this.info = info;

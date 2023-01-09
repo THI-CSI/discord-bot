@@ -72,7 +72,43 @@ module.exports = class Utils {
 		});
 	}
 
-	encryptJSON(json) {
-		return this.client.db.encrypt(JSON.stringify(json));
+	async checkUserPriviledge(userId, memberRoles, requiredPerms) {
+		// Check if User has the required Permissions
+		let permsSelectSql = 'SELECT permission from user_permissions WHERE userId = ?';
+		const permsSelectValues = [userId];
+
+		if (memberRoles.size > 0) {
+			permsSelectSql += ' UNION SELECT permission from role_permissions WHERE ';
+			memberRoles.forEach(cachedRole => {
+				permsSelectSql += 'roleId = ? OR ';
+				permsSelectValues.push(cachedRole.id);
+			});
+			permsSelectSql = permsSelectSql.substring(0, permsSelectSql.length - 4) + ';';
+		}
+
+		let permsSelectResult = await this.client.db.select(permsSelectSql, permsSelectValues);
+
+		permsSelectResult = permsSelectResult.map(row => row.permission);
+
+		if (!requiredPerms.every(element => permsSelectResult.includes(element))) {
+			return { success: false, perms: permsSelectResult };
+		}
+		else {
+			return { success: true, perms: permsSelectResult };
+		}
+	}
+
+	compareRolePerms(role, me) {
+		// Check if we can use this role in the future
+		if (role.managed) {
+			return { success: false, error: 'ROLE_MANAGED' };
+		}
+
+		// Check if our highest Role is higher than the mentioned role
+		if (role.comparePositionTo(me.roles.highest) >= 0) {
+			return { success: false, error: 'ROLE_HIGHER' };
+		}
+
+		return { success: true, error: null };
 	}
 };

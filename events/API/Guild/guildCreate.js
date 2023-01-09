@@ -44,5 +44,19 @@ module.exports = class extends Event {
 		}
 
 
+		// try to register the guild
+		const guildData = JSON.stringify({ visitorrole: '' });
+		const insertSQL = 'INSERT INTO `servers` (`serverId`, `data`, `IV`) VALUES (?, ?, ?);';
+
+		try {
+			const [encrypted, IV] = this.client.db.encrypt(guildData);
+			const insertValues = [guild.id, encrypted, IV];
+			await this.client.db.query(insertSQL, insertValues);
+		}
+		catch (e) {
+			this.client.error('GUILDS', ['Error while adding Guild to Database', e.message]);
+		}
+
+
 	}
 };
