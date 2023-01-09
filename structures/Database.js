@@ -5,20 +5,17 @@ const Logger = require('./Logger');
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc';
 const ENC_KEY = Buffer.from(process.env.ENC_K, 'hex');
-const IV = Buffer.from(process.env.ENC_IV, 'hex');
 
 
-const decrypt = ((encrypted) => {
+const decrypt = ((encrypted, iv) => {
 	const encryptedDataString = Buffer.from(encrypted).toString('utf8');
+	const ivBuffer = Buffer.from(iv, 'hex');
 
-
-	const decipher = crypto.createDecipheriv(algorithm, ENC_KEY, IV);
+	const decipher = crypto.createDecipheriv(algorithm, ENC_KEY, ivBuffer);
 	let decryptedData = decipher.update(encryptedDataString, 'hex', 'utf8');
 	decryptedData += decipher.final('utf8');
 	return decryptedData;
 });
-
-
 const pool = mysql.createPool({
 	connectionLimit: process.env.MARIADB_MAXCONNECTIONS,
 	host: process.env.MARIADB_HOST,
@@ -35,10 +32,11 @@ const pool = mysql.createPool({
 module.exports = {
 	pool: pool,
 	encrypt: ((val) => {
-		const cipher = crypto.createCipheriv(algorithm, ENC_KEY, IV);
+		const randomIV = crypto.randomBytes(16);
+		const cipher = crypto.createCipheriv(algorithm, ENC_KEY, randomIV);
 		let encrypted = cipher.update(val, 'utf8', 'hex');
 		encrypted += cipher.final('hex');
-		return encrypted;
+		return [encrypted, randomIV.toString('hex')];
 	}),
 	query: (sql, values) => {
 		return new Promise(async (resolve, reject) => { // eslint-disable-line no-async-promise-executor
@@ -70,35 +68,39 @@ module.exports = {
 
 
 				const decryptedResults = response.map(row => {
-					// Create a new object to store the decrypted data
-					const decryptedRow = {};
+					// Check if there is a Column named IV
+					if (row.iv) {
+						const decryptedRow = {};
+						// Iterate over each column in the row
+						for (const [column, value] of Object.entries(row)) {
+							if (column !== 'iv') {
+								// Check if the data in the column is encrypted by trying to decrypt it
+								try {
+									// Use the decryption key to attempt to decrypt the data
 
-					// Iterate over each column in the row
-					for (const [column, value] of Object.entries(row)) {
-						// Check if the data in the column is encrypted by trying to decrypt it
-						try {
-							// Use the decryption key to attempt to decrypt the data
+									const decryptedValue = decrypt(value, row.iv);
 
-							const decryptedValue = decrypt(value);
-
-							// If the decryption was successful, the data is encrypted
-							Logger.debug('DATABASE', [`Data in column "${column}" is encrypted`]);
+									// If the decryption was successful, the data is encrypted
+									Logger.debug('DATABASE', [`Data in column "${column}" is encrypted`]);
 
 
-							decryptedRow[column] = decryptedValue;
+									decryptedRow[column] = decryptedValue;
+								}
+								catch (err) {
+									// If the decryption failed, the data is not encrypted
+									Logger.debug('DATABASE', [`Data in column "${column}" is not encrypted`]);
+									decryptedRow[column] = value;
+								}
+							}
+
+
 						}
-						catch (err) {
-							// If the decryption failed, the data is not encrypted
-							Logger.debug('DATABASE', [`Data in column "${column}" is not encrypted`]);
-							decryptedRow[column] = value;
-						}
-
-
+						return decryptedRow;
 					}
-
-					return decryptedRow;
+					else {
+						return row;
+					}
 				});
-
 
 				// iterate through every result and add it to the message array
 				let i = 0;
