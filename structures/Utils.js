@@ -38,7 +38,7 @@ module.exports = class Utils {
 					throw new TypeError(`The Event ${name} is not an instance of Event`);
 				}
 				if (event.isActive) {
-					this.client.logger.debug('INTERNAL', [`Event ${event.name} was loaded!`]);
+					this.client.logger.verbose('INTERNAL', [`Event ${event.name} was loaded!`]);
 					this.client.events.set(event.name, event);
 					event.emitter[event.type](name, (...args) => event.run(...args));
 				}
@@ -64,7 +64,7 @@ module.exports = class Utils {
 					throw new TypeError(`The Command ${name} is not an instance of Command.`);
 				}
 				if (command.isActive) {
-					this.client.logger.debug('INTERNAL', [`Command ${command.name} was loaded!`]);
+					this.client.logger.verbose('INTERNAL', [`Command ${command.name} was loaded!`]);
 					this.client.commands.set(command.name, command);
 				}
 

@@ -44,6 +44,10 @@ const logger = createLogger({
 			timestamp({ format: 'DD.MM.YYYY HH:mm' }),
 			myFormat,
 		),
+	}), new transports.File({
+		level: 'silly',
+		filename: 'logs/winston.log',
+		maxsize: 3000000,
 	})],
 });
 
@@ -65,6 +69,13 @@ module.exports = {
 	error: (service, messages) => {
 		logger.log({
 			level: 'error',
+			messages: messages,
+			label: service,
+		});
+	},
+	verbose: (service, messages) => {
+		logger.log({
+			level: 'verbose',
 			messages: messages,
 			label: service,
 		});

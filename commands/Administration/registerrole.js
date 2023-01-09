@@ -91,7 +91,7 @@ module.exports = class extends Command {
 				});
 			}
 
-			this.client.logger.debug('SERVICE', [`A new Role (${role.id}) was registered for Server ${role.guild.id} by User with the Id ${interaction.user.id}!`]);
+			this.client.logger.verbose('SERVICE', [`A new Role (${role.id}) was registered for Server ${role.guild.id} by User with the Id ${interaction.user.id}!`]);
 			return interaction.reply({
 				content: 'The Role was successfully registered into the Database!',
 				ephemeral: true,

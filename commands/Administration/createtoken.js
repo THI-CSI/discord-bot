@@ -91,7 +91,7 @@ module.exports = class extends Command {
 					const insertResult = await this.client.db.query(insertSql, insertValues);
 					const token = insertResult[0][0].token;
 					tokens.push(token);
-					this.client.logger.debug('TOKEN', [`Token '${token}' was generated for the Role with the following ID: ${role.id} on the Guild with the following ID: ${guild.id} by User ID: ${interaction.user.id}`]);
+					this.client.logger.verbose('TOKEN', [`Token '${token}' was generated for the Role with the following ID: ${role.id} on the Guild with the following ID: ${guild.id} by User ID: ${interaction.user.id}`]);
 				}
 
 				const embed = new EmbedBuilder()
