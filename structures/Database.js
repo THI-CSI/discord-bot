@@ -31,12 +31,12 @@ const pool = mysql.createPool({
 
 module.exports = {
 	pool: pool,
-	encrypt: ((val) => {
-		const randomIV = crypto.randomBytes(16);
-		const cipher = crypto.createCipheriv(algorithm, ENC_KEY, randomIV);
-		let encrypted = cipher.update(val, 'utf8', 'hex');
+	encrypt: ((data, givenIV = null) => {
+		const iv = (givenIV != null ? givenIV : crypto.randomBytes(16));
+		const cipher = crypto.createCipheriv(algorithm, ENC_KEY, iv);
+		let encrypted = cipher.update(data, 'utf8', 'hex');
 		encrypted += cipher.final('hex');
-		return [encrypted, randomIV.toString('hex')];
+		return [encrypted, iv.toString('hex')];
 	}),
 	query: (sql, values) => {
 		return new Promise(async (resolve, reject) => { // eslint-disable-line no-async-promise-executor
@@ -77,13 +77,9 @@ module.exports = {
 								// Check if the data in the column is encrypted by trying to decrypt it
 								try {
 									// Use the decryption key to attempt to decrypt the data
-
 									const decryptedValue = decrypt(value, row.iv);
-
 									// If the decryption was successful, the data is encrypted
 									Logger.debug('DATABASE', [`Data in column "${column}" is encrypted`]);
-
-
 									decryptedRow[column] = decryptedValue;
 								}
 								catch (err) {
