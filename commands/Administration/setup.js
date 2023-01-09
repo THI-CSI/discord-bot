@@ -30,6 +30,13 @@ module.exports = class extends Command {
 			.setDescription('Re-Setup this Server to be able to use me!').toJSON();
 		queue.push(setupCommand);
 
+		const maintainerCommand = new SlashCommandBuilder()
+			.setName('maintainer')
+			.setDMPermission(false)
+			.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+			.setDescription(`Current ${process.env.MAINTAINER_DISCORD_ID.split(',').length === 1 ? 'maintainer' : 'maintainers'} for this Instance`).toJSON();
+		queue.push(maintainerCommand);
+
 		const authenticationCommand = new SlashCommandBuilder()
 			.setName('authenticate')
 			.setDMPermission(false)
@@ -87,9 +94,10 @@ module.exports = class extends Command {
 				await interaction.guild.commands.create(command);
 			}
 			this.client.logger.debug('SLASHCOMMANDS', [`Added ${queue.length} new Guild-Only Slash Commands to ${interaction.guild.name}`]);
-			await interaction.editReply({ content: `Cool!\n${queue.length} Commands were added to your Guild!\nIncase of any questions, feel free to DM [me](https://discord.id/?prefill=${process.env.MAINTAINER_DISCORD_ID ?? '0'})\nEnjoy!` });
+			await interaction.editReply({ content: `Cool!\n${queue.length} Commands were added to your Guild!\nIncase of any questions, feel free to contact the \`/maintainer\`\nEnjoy!` });
 		}
 		catch (e) {
+			await interaction.editReply({ content: 'There was a Problem while setting up your server. Please try again later or contact the maintainer.', ephemeral: true });
 			this.client.logger.error('SLASHCOMMADNS', ['Failed creating a slash command:', e.message]);
 		}
 

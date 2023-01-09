@@ -13,18 +13,34 @@ module.exports = class extends Event {
 	}
 
 	async run(guild) {
+
+		const queue = [];
+		const maintainerCommand = new SlashCommandBuilder()
+			.setName('maintainer')
+			.setDMPermission(false)
+			.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+			.setDescription(`Current ${process.env.MAINTAINER_DISCORD_ID.split(',').length === 1 ? 'maintainer' : 'maintainers'} for this Instance`).toJSON();
+		queue.push(maintainerCommand);
+
 		const setupCommand = new SlashCommandBuilder()
 			.setName('setup')
 			.setDMPermission(false)
 			.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 			.setDescription('Setup this Server to be able to use me!').toJSON();
+		queue.push(setupCommand);
 
-		const guildCommands = await guild.commands.fetch();
+		await guild.commands.set([]);
 
 		// Check if Guild Commands already have our command (Is this needed?)
 		// TODO
-		if (!guildCommands.find(v => v.name === 'setup')) {
-			await guild.commands.create(setupCommand).then(() => this.client.logger.info('GUILDS', [`JOINED A GUILD: ${guild.name}, ${guild.memberCount} Members, ID: ${guild.id}, Owner: ${guild.ownerId}`])).catch(err => this.client.logger.error('SLASHCOMMADNS', ['Failed creating a slash command:', err.message]));
+		try {
+			for (const command of queue) {
+				await guild.commands.create(command);
+			}
+			this.client.logger.debug('SLASHCOMMANDS', [`Added ${queue.length} new Guild-Only Slash Commands to ${guild.name}`]);
+		}
+		catch (e) {
+			this.client.logger.error('SLASHCOMMADNS', ['Failed creating a slash command:', e.message]);
 		}
 
 
