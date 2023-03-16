@@ -105,7 +105,7 @@ module.exports = class extends Command {
 			.addBooleanOption(new SlashCommandBooleanOption()
 				.setName('fulldelete')
 				.setRequired(true)
-				.setDescription('Do you want to delete the Token completely or just revoke it? Revoking will keep the Token in the Database, but it will be unusable.'))
+				.setDescription('Do you want to delete the Token completely or just revoke it?'))
 			.addStringOption(new SlashCommandStringOption()
 				.setName('comment')
 				.setMaxLength(250)
@@ -128,6 +128,8 @@ module.exports = class extends Command {
 			await interaction.editReply({ content: 'There was a Problem while setting up your server. Please try again later or contact the maintainer.', ephemeral: true });
 			this.client.error('SLASHCOMMADNS', ['Failed creating a slash command:', e.message]);
 		}
+
+		// TODO Register a Server Admin Role for this Server
 
 	}
 
