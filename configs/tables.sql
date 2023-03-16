@@ -1,3 +1,9 @@
+CREATE TABLE servers (
+  `serverId` VARCHAR(20) PRIMARY KEY NOT NULL,
+  `data` LONGBLOB,
+  `iv` VARCHAR(32) NOT NULL
+) ENGINE = INNODB;
+
 CREATE TABLE bot.roles (
   `roleId` VARCHAR(20) PRIMARY KEY NOT NULL,
   `serverId` VARCHAR(20) NOT NULL,
@@ -15,23 +21,41 @@ CREATE TABLE bot.tokens (
 	FOREIGN KEY (`targetRole`) REFERENCES `roles` (`roleId`)
 ) ENGINE = INNODB;
 
-/*
+
 CREATE TABLE bot.users (
   `userId` VARCHAR(20) PRIMARY KEY,
   `data` LONGBLOB
 );
-*/
+
+CREATE TABLE scopes (
+  `scopeName` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`scopeName`)
+) ENGINE=INNODB;
+
+INSERT INTO `scopes` (`scopeName`) VALUES ('global'), ('guild');
+
+CREATE TABLE permissions (
+  `permissionName` VARCHAR(255) NOT NULL,
+  `scope` VARCHAR(10) NOT NULL,
+  PRIMARY KEY (`permissionName`),
+  FOREIGN KEY (`scope`) REFERENCES `scopes`(`scopeName`)
+) ENGINE=INNODB;
 
 CREATE TRIGGER uppercase_permission_names
 BEFORE INSERT ON permissions
 FOR EACH ROW
 SET NEW.permissionName = UPPER(REPLACE(NEW.permissionName,' ', '_'));
 
+INSERT INTO `permissions` (`permissionName`, `scope`) VALUES ('*', 'global'), ('GLOBAL_ADMIN', 'global'), ('GUILD_ADMIN', 'guild'), ('MANAGE_GUILD', 'guild'), ('MANAGE_ROLES_GUILD', 'guild'), ('MANAGE_TOKENS_GUILD', 'guild');
 
-CREATE TABLE permissions (
+CREATE TABLE permission_overwrites (
   `permissionName` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`permissionName`)
+  `overwrites` VARCHAR(255) NOT NULL,
+  FOREIGN KEY (`permissionName`) REFERENCES `permissions` (`permissionName`),
+  FOREIGN KEY (`overwrites`) REFERENCES `permissions` (`permissionName`)
 ) ENGINE=INNODB;
+
+INSERT INTO `permission_overwrites` (`permissionName`, `overwrites`) VALUES ('*', 'GLOBAL_ADMIN'), ('GLOBAL_ADMIN', 'GUILD_ADMIN'), ('GUILD_ADMIN', 'MANAGE_GUILD'), ('GUILD_ADMIN', 'MANAGE_ROLES_GUILD'), ('GUILD_ADMIN', 'MANAGE_TOKENS_GUILD');
 
 CREATE TABLE bot.role_permissions (
   `permissionId` VARCHAR(50) DEFAULT UUID(),
@@ -46,7 +70,7 @@ CREATE TABLE bot.role_permissions (
   FOREIGN KEY (`permission`) REFERENCES `permissions`(`permissionName`)
 ) ENGINE=INNODB;
 
-/*
+
 CREATE TABLE bot.user_permissions (
   `permissionId` VARCHAR(50) DEFAULT UUID(),
   `userId` VARCHAR(20) NOT NULL,
@@ -60,4 +84,4 @@ CREATE TABLE bot.user_permissions (
   FOREIGN KEY (`permission`) REFERENCES `permissions`(`permissionName`)
 ) ENGINE=INNODB;
 
-*/
+
