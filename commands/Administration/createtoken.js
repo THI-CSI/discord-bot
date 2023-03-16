@@ -4,7 +4,7 @@ module.exports = class extends Command {
 
 	constructor(...args) {
 		super(...args, {
-			description: 'Registers new Roles into the Database',
+			description: 'Creates new Tokens for a specified Role.',
 			isActive: true,
 			requiredPerms: ['MANAGE_TOKENS_GUILD'],
 		});
