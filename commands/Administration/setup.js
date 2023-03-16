@@ -5,6 +5,7 @@ const {
 	PermissionFlagsBits,
 	SlashCommandRoleOption,
 	SlashCommandIntegerOption,
+	SlashCommandBooleanOption,
 } = require('discord.js');
 
 module.exports = class extends Command {
@@ -91,6 +92,26 @@ module.exports = class extends Command {
 				.setRequired(false)
 				.setDescription('Optional comment that will be saved alongside the Tokens.')).toJSON();
 		queue.push(createTokenCommand);
+
+		const deleteTokenCommand = new SlashCommandBuilder()
+			.setName('deletetoken')
+			.setDMPermission(false)
+			.setDescription('Delete Tokens for this server')
+			.addStringOption(new SlashCommandStringOption()
+				.setMaxLength(Number.parseInt(process.env.TOKENS_MAX_LENGTH))
+				.setName('token')
+				.setRequired(true)
+				.setDescription('Insert the Token you want to delete'))
+			.addBooleanOption(new SlashCommandBooleanOption()
+				.setName('fulldelete')
+				.setRequired(true)
+				.setDescription('Do you want to delete the Token completely or just revoke it? Revoking will keep the Token in the Database, but it will be unusable.'))
+			.addStringOption(new SlashCommandStringOption()
+				.setName('comment')
+				.setMaxLength(250)
+				.setRequired(false)
+				.setDescription('Optional comment that will appear in the Logs.')).toJSON();
+		queue.push(deleteTokenCommand);
 
 		await interaction.guild.commands.set([]);
 
