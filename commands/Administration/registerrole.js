@@ -18,13 +18,15 @@ module.exports = class extends Command {
 			const role = interaction.options.getRole('role');
 			const comment = interaction.options.getString('comment') ?? 'NULL';
 
-			const privCheck = await this.client.utils.checkUserPriviledge(interaction.user.id, interaction.member.roles.cache, this.requiredPerms);
-			if (!privCheck.success) {
-				return interaction.reply({
-					content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions: **${privCheck.perms.join(', ')}**`,
-					ephemeral: true,
-				});
-			}
+
+            // Owners of Guilds skip this check to be able to add Roles to the Database without having the required Permissions
+            const privCheck = await this.client.utils.checkUserPrivilege(interaction, this.requiredPerms);
+            if (!privCheck.success) {
+                return interaction.reply({
+                    content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions: **${privCheck.perms.join(', ').length > 0 ? privCheck.perms.join(', ') : "None"}**`,
+                    ephemeral: true,
+                });
+            }
 
 			const self = await interaction.guild.members.fetchMe();
 			const roleCompare = await this.client.utils.compareRolePerms(role, self);

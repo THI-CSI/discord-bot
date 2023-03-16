@@ -14,10 +14,10 @@ module.exports = class extends Command {
 	async run(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 
-		const privCheck = await this.client.utils.checkUserPriviledge(interaction.user.id, interaction.member.roles.cache, this.requiredPerms);
+		const privCheck = await this.client.utils.checkUserPrivilege(interaction, this.requiredPerms);
 		if (!privCheck.success) {
 			return interaction.editReply({
-				content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions: **${privCheck.perms.join(', ')}**`,
+				content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions:  **${privCheck.perms.join(', ').length > 0 ? privCheck.perms.join(', ') : "None"}**`,
 				ephemeral: true,
 			});
 		}
@@ -225,7 +225,7 @@ module.exports = class extends Command {
 					serverData = JSON.stringify(serverData);
 					const [encrypted, iv] = this.client.db.encrypt(serverData);
 
-					const updateSql = 'UPDATE servers SET data = ?, IV = ? WHERE serverId =  ?;';
+					const updateSql = 'UPDATE servers SET data = ?, iv = ? WHERE serverId =  ?;';
 					const updateValues = [encrypted, iv, i.guild.id];
 
 					await this.client.db.query(updateSql, updateValues);

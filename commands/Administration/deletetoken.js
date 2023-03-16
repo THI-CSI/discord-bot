@@ -1,5 +1,4 @@
 const Command = require('../../structures/Command');
-const { EmbedBuilder } = require('discord.js');
 module.exports = class extends Command {
 
     constructor(...args) {
@@ -24,10 +23,10 @@ module.exports = class extends Command {
                 const deleteFully = interaction.options.getBoolean('fulldelete');
                 const comment = interaction.options.getString('comment') ?? 'NULL';
 
-                const privCheck = await this.client.utils.checkUserPriviledge(interaction.user.id, interaction.member.roles.cache, this.requiredPerms);
+                const privCheck = await this.client.utils.checkUserPrivilege(interaction, this.requiredPerms);
                 if (!privCheck.success) {
                     return interaction.reply({
-                        content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions: **${privCheck.perms.join(', ')}**`,
+                        content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions:  **${privCheck.perms.join(', ').length > 0 ? privCheck.perms.join(', ') : "None"}**`,
                         ephemeral: true,
                     });
                 }
@@ -62,7 +61,7 @@ module.exports = class extends Command {
                     deleteSql = 'UPDATE tokens SET usedAt = 0 WHERE token = ?;';
                     deleteValues = [token];
                 }
-                const deleteResult = await this.client.db.query(deleteSql, deleteValues);
+                await this.client.db.query(deleteSql, deleteValues);
                 this.client.verbose('TOKEN', [`Token '${token}' was ${deleteFully ? "deleted" : "revoked"} for the Role with the following ID: ${selectResult[0].targetRole} on the Guild with the following ID: ${guild.id} by User ID: ${interaction.user.id} with the comment: ${comment}`]);
 
                 return await interaction.editReply({

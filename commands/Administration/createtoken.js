@@ -24,10 +24,10 @@ module.exports = class extends Command {
 				const amount = interaction.options.getInteger('amount');
 				const comment = interaction.options.getString('comment') ?? 'NULL';
 
-				const privCheck = await this.client.utils.checkUserPriviledge(interaction.user.id, interaction.member.roles.cache, this.requiredPerms);
+				const privCheck = await this.client.utils.checkUserPrivilege(interaction, this.requiredPerms);
 				if (!privCheck.success) {
 					return interaction.reply({
-						content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions: **${privCheck.perms.join(', ')}**`,
+						content: `You do not have all of the required Permissions to run this command!\nRequired Permissions: **${this.requiredPerms.join(', ')}**\nYour Permissions:  **${privCheck.perms.join(', ').length > 0 ? privCheck.perms.join(', ') : "None"}**`,
 						ephemeral: true,
 					});
 				}

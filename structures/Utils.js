@@ -72,29 +72,63 @@ module.exports = class Utils {
 		});
 	}
 
-	async checkUserPriviledge(userId, memberRoles, requiredPerms) {
-		// Check if User has the required Permissions
-		let permsSelectSql = 'SELECT permission from user_permissions WHERE userId = ?';
-		const permsSelectValues = [userId];
+	async checkUserPrivilege(interaction, requiredPerms) {
+		const selectSQL = 'SELECT * FROM permission_overwrites';
+		const selectResult = await this.client.db.select(selectSQL);
+		await interaction.member.fetch();
+		const userPerms = await this.userPermissions(interaction.member.id, interaction.member.roles.cache);
 
-		if (memberRoles.size > 0) {
-			permsSelectSql += ' UNION SELECT permission from role_permissions WHERE ';
-			memberRoles.forEach(cachedRole => {
-				permsSelectSql += 'roleId = ? OR ';
-				permsSelectValues.push(cachedRole.id);
-			});
-			permsSelectSql = permsSelectSql.substring(0, permsSelectSql.length - 4) + ';';
+		if (requiredPerms.every(element => userPerms.includes(element))) {
+			return { success: true, perms: userPerms };
 		}
 
-		let permsSelectResult = await this.client.db.select(permsSelectSql, permsSelectValues);
+		// find every missing permission in userperms
+		const missingPerms = requiredPerms.filter(element => !userPerms.includes(element));
+		let overwrittenPerms = [];
+		for (const permission of missingPerms) {
+			// check if permission is in selectResult and thus overwritable
+			const overwritable = !!selectResult.find(row => row.overwrites === permission);
 
-		permsSelectResult = permsSelectResult.map(row => row.permission);
-
-		if (!requiredPerms.every(element => permsSelectResult.includes(element))) {
-			return { success: false, perms: permsSelectResult };
+			// if permission is overwritable, check if user has permission to overwrite
+			if (overwritable) {
+				// check if user has the permission that overwrites the missing permission
+				const index = selectResult.findIndex(row => row.overwrites === permission);
+				const found = !!userPerms.find(element => element === selectResult[index].permissionName);
+				if(found) {
+					// find index of permission in missing Perms and remove it
+					overwrittenPerms.push({permission: permission, overwritten: selectResult[index].permissionName});
+				}
+			}
 		}
-		else {
-			return { success: true, perms: permsSelectResult };
+
+		if(missingPerms.length !== overwrittenPerms.length) {
+			return { success: false, perms: userPerms, overwrittenPerms: overwrittenPerms };
+		} else {
+			return { success: true, perms: userPerms,  overwrittenPerms: overwrittenPerms };
+		}
+
+	}
+
+	async userPermissions(userId, memberRoles) {
+		try {
+			let permsSelectSql = 'SELECT permission from user_permissions WHERE userId = ?';
+			const permsSelectValues = [userId];
+
+			if (memberRoles.size > 0) {
+				permsSelectSql += ' UNION SELECT permission from role_permissions WHERE ';
+				memberRoles.forEach(cachedRole => {
+					permsSelectSql += 'roleId = ? OR ';
+					permsSelectValues.push(cachedRole.id);
+				});
+				permsSelectSql = permsSelectSql.substring(0, permsSelectSql.length - 4) + ';';
+			}
+
+			let permsSelectResult = await this.client.db.select(permsSelectSql, permsSelectValues);
+
+			return permsSelectResult.map(row => row.permission);
+		} catch (e) {
+			this.client.error('GUILDS', ['Error while fetching User Permissions!', e.message]);
+			return [];
 		}
 	}
 
