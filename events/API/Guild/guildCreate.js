@@ -46,7 +46,7 @@ module.exports = class extends Event {
 
 		// try to register the guild
 		const guildData = JSON.stringify({ visitorrole: '' });
-		const insertSQL = 'INSERT INTO `servers` (`serverId`, `data`, `IV`) VALUES (?, ?, ?);';
+		const insertSQL = 'INSERT INTO `servers` (`serverId`, `data`, `iv`) VALUES (?, ?, ?);';
 
 		try {
 			const [encrypted, IV] = this.client.db.encrypt(guildData);
